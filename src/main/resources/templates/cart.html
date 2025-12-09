@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito de Compra</title>
+</head>
+<body>
+    <h1>Acceder al Carrito</h1>
+    <form th:action="@{/cart}" method="get">
+        <label for="cartId">ID del Carrito:</label>
+        <input type="number" id="cartId" name="cartId" required>
+        <button type="submit">Ver Carrito</button>
+    </form>
+</body>
+</html>

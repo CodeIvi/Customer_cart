@@ -1,7 +1,5 @@
 package org.iesvdm.shoppingcart.controller;
 
-import org.iesvdm.shoppingcart.model.CustomerOrder;
-import org.iesvdm.shoppingcart.model.OrderItem;
 import org.iesvdm.shoppingcart.service.CustomerOrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

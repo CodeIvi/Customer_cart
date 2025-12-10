@@ -1,20 +1,19 @@
 package org.iesvdm.shoppingcart.service;
 
 import org.iesvdm.shoppingcart.model.CustomerOrder;
-import org.iesvdm.shoppingcart.repository.CustomerOrderRepository;
+import org.iesvdm.shoppingcart.repository.ShoppingRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CustomerOrderService {
-private CustomerOrderRepository customerOrderRepository;
+private ShoppingRepository shoppingRepository;
 
-    public CustomerOrderService(CustomerOrderService customerOrderService, CustomerOrderRepository customerOrderRepository) {
-        this.customerOrderRepository = customerOrderRepository;
+    public CustomerOrderService(ShoppingRepository shoppingRepository) {
+        this.shoppingRepository = shoppingRepository;
     }
 
+
     public CustomerOrder findById(long id){
-        return customerOrderRepository.findById(id);
+        return shoppingRepository.findById(id);
     }
 }

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class CustomerOrder {
     private Long id;
     private String orderNumber;

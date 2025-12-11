@@ -5,11 +5,105 @@
     <title>Carrito de Compra</title>
 </head>
 <body>
-    <h1>Acceder al Carrito</h1>
-    <form th:action="@{/cart}" method="get">
-        <label for="cartId">ID del Carrito:</label>
-        <input type="number" id="cartId" name="cartId" required>
-        <button type="submit">Ver Carrito</button>
+<div class="cart-container">
+
+    <h2>Step 1 of 3 - Shopping Cart</h2>
+
+    <h3>Products in your cart</h3>
+
+    <table class="cart-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Unit price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="item : ${orderlist}">
+            <td th:text="${item.productName}">Product name</td>
+            <td th:text="${item.unitPrice} + ' €'">0.00 €</td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="${item.lineTotal} + ' €'">0.00 €</td>
+            <td>
+            <form th:action="@{/cart/yourcart}" method="post">
+                <input type="hidden" name="idProduct" th:value="${item.id}">
+                <input type="hidden" name="action" value="subtract">
+                <input type="hidden" name="idCart" th:value = "${idCart}">
+                <button type="submit">[-]</button>
+            </form>
+            </td>
+
+            <!-- Sumar -->
+            <td>
+            <form th:action="@{/cart/yourcart}" method="post">
+
+                <input type="hidden" name="idProduct" th:value="${item.id}">
+                <input type="hidden" name="idCart" th:value = "${idCart}">
+                <input type="hidden" name="action" value="increment">
+                <button type="submit">[+]</button>
+            </form>
+            </td>
+
+            <!-- Eliminar -->
+            <td>
+            <form th:action="@{/cart/yourcart}" method="post">
+                <input type="hidden" name="idProduct" th:value="${item.id}">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="idCart" th:value = "${idCart}">
+                <button type="submit">[X]</button>
+            </form>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+    <hr/>
+
+
+    <h3>Add new product:</h3>
+
+
+    <form th:action="@{/cart/add}" th:object="${product}" method="post">
+        Name: <input type="text" th:field="*{productName}" required />
+        Price: <input type="number" step="0.01" th:field="*{unitPrice}" required />
+        Qty: <input type="number" th:field="*{quantity}" min="1" required />
+        <input type="hidden" th:field="idCart">
+        <button type="submit">Add</button>
     </form>
+
+    <hr/>
+
+    <!-- Cupón descuento -->
+    <form th:action="@{/cart/apply-coupon}" method="post">
+        Discount coupon:
+        <input type="text" name="coupon" />
+        <button type="submit">Apply</button>
+    </form>
+
+    <div th:if="${appliedCoupon != null}">
+        <p>Applied coupon: <span th:text="${appliedCoupon}"></span> →
+            <span th:text="('-' + discount) + ' €'">-0.00 €</span>
+        </p>
+    </div>
+
+    <hr/>
+
+    <!-- Totales -->
+    <p>Gross total: <b th:text="${grossTotal} + ' €'">0.00 €</b></p>
+    <p>Coupon discount: <b th:text="('-' + discount) + ' €'">-0.00 €</b></p>
+    <p>Total to pay: <b th:text="${totalToPay} + ' €'">0.00 €</b></p>
+
+    <br/>
+
+    <a class="next-step" th:href="@{/checkout/step2}">
+        [ Continue to Step 2 > ]
+    </a>
+
+</div>
 </body>
 </html>

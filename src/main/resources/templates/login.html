@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Acceder al Carrito</h1>
+<form th:action="@{/cart/yourcart}" method="post">
+    <label for="cartId">ID del Carrito:</label>
+    <input type="number" id="cartId" name="idCart" required>
+    <button type="submit">Ver Carrito</button>
+</form>
+
+<div th:if="${mensaje}">
+    <span th:text="${mensaje}"></span>
+</div>
+
+
+</body>
+</html>

@@ -16,7 +16,7 @@ public class OrderItem {
     private long orderId;
     private long productId;
     private String productName;
-    private double unitPrice;
+    private BigDecimal unitPrice;
     private BigDecimal quantity;
     private BigDecimal lineTotal;
 }

@@ -19,4 +19,8 @@ public class CustomerOrderService {
     public List<CustomerOrder> getAllCustomerOrders(){
         return customerOrderRepository.getAllCustomerOrders();
     }
+
+    public void updateCustomerOrder(CustomerOrder customerOrder){
+        customerOrderRepository.updateCustomerOrder(customerOrder);
+    }
 }

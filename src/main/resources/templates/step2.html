@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - Addresses</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+
+            <h2 class="card-title mb-4">Step 2 of 3 - Billing and Shipping</h2>
+
+            <form th:action="@{/cart/checkout/step2}" method="post" th:object="${customerOrder}" class="row g-3">
+
+                <!-- Billing Address -->
+                <div class="col-12">
+                    <h3>Billing Address</h3>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" th:field="*{billingName}" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Tax ID (optional)</label>
+                    <input type="text" th:field="*{billingTaxId}" class="form-control">
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Street</label>
+                    <input type="text" th:field="*{billingStreet}" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">City</label>
+                    <input type="text" th:field="*{billingCity}" class="form-control" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Postal Code</label>
+                    <input type="text" th:field="*{billingPostalCode}" class="form-control" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Country</label>
+                    <input type="text" th:field="*{billingCountry}" class="form-control" required>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="col-12 mt-4">
+                    <h3>Shipping Address</h3>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="sameAsBilling" value="true">
+                        <label class="form-check-label">Use same address as billing</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Recipient Name</label>
+                    <input type="text" th:field="*{shippingName}" class="form-control" required>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Street</label>
+                    <input type="text" th:field="*{shippingStreet}" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">City</label>
+                    <input type="text" th:field="*{shippingCity}" class="form-control" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Postal Code</label>
+                    <input type="text" th:field="*{shippingPostalCode}" class="form-control" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Country</label>
+                    <input type="text" th:field="*{shippingCountry}" class="form-control" required>
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Next Step - Payment</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

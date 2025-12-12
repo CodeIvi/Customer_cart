@@ -5,6 +5,7 @@ import org.iesvdm.shoppingcart.model.OrderItem;
 import org.iesvdm.shoppingcart.repository.OrdersRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -38,6 +39,19 @@ public class OrderService {
     public OrderItem createOrderItem(OrderItem orderItem){
         return ordersRepository.createOrderItem(orderItem);
     }
+
+
+
+    public BigDecimal grossTotal(List<OrderItem> orderItems){
+        BigDecimal cuenta = BigDecimal.ZERO;
+
+        // Sumar todos los lineTotal
+        for (OrderItem item : orderItems) {
+            cuenta = cuenta.add(item.getLineTotal());
+        }
+        return cuenta;
+    }
+
 }
 
 

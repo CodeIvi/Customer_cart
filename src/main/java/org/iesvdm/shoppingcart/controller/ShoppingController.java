@@ -1,10 +1,13 @@
 package org.iesvdm.shoppingcart.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.iesvdm.shoppingcart.model.Coupon;
 import org.iesvdm.shoppingcart.model.CustomerOrder;
 import org.iesvdm.shoppingcart.model.OrderItem;
 import org.iesvdm.shoppingcart.model.Product;
+import org.iesvdm.shoppingcart.repository.CouponRepository;
 import org.iesvdm.shoppingcart.repository.CustomerOrderRepository;
+import org.iesvdm.shoppingcart.service.CouponService;
 import org.iesvdm.shoppingcart.service.CustomerOrderService;
 import org.iesvdm.shoppingcart.service.OrderService;
 import org.iesvdm.shoppingcart.service.ProductService;
@@ -17,21 +20,23 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping("/cart")
-@SessionAttributes("cart")
+@SessionAttributes("customerOrder")
 public class ShoppingController {
 
 
     private final OrderService orderService;
     private final ProductService productService;
     private final CustomerOrderService customerOrderService;
+    private final CouponService couponService;
 
-    public ShoppingController(OrderService orderService, ProductService productService, CustomerOrderService customerOrderService) {
+    public ShoppingController(OrderService orderService, ProductService productService, CustomerOrderService customerOrderService, CouponRepository couponRepository, CouponService couponService) {
         this.orderService = orderService;
         this.productService = productService;
         this.customerOrderService = customerOrderService;
+        this.couponService = couponService;
     }
 
-    @ModelAttribute("cart")
+    @ModelAttribute("customerOrder")
     public CustomerOrder cart() {
         return new CustomerOrder();
     }
@@ -52,17 +57,23 @@ public class ShoppingController {
                           @RequestParam(value = "action", required = false) String action,
                           @RequestParam(value = "idAddProduct", required = false) Long idAddProduct,
                           @RequestParam(value = "quantity", required = false) BigDecimal quantity,
-                          @ModelAttribute Product product) {
-        model.addAttribute("product", new Product());
+                          @RequestParam(value = "coupon",required = false) String coupon,
+                          @ModelAttribute ("customerOrder") CustomerOrder customerOrder) {
+
+
+
         model.addAttribute("idCart", idCart);
         model.addAttribute("listaProductos", productService.getALL());
 
-        CustomerOrder customerOrder = orderService.findById(idCart);
+        customerOrder = orderService.findById(idCart);
+        model.addAttribute("customerOrder", customerOrder);
         List<OrderItem> orderList = orderService.orderlist(idCart);
+        List<Coupon> couponsList = couponService.couponList();
 
         if (customerOrder != null && customerOrder.getStatus().equalsIgnoreCase("new")) {
             model.addAttribute("cart", customerOrder);
             model.addAttribute("orderlist", orderList);
+            model.addAttribute("couponList",couponsList);
 
 
             if (action != null && action.equals("increment")) {
@@ -107,6 +118,26 @@ public class ShoppingController {
                 model.addAttribute("listaProductos", productService.getALL());
 
             }
+
+            if(coupon != null){
+                BigDecimal totalToPay= couponService.applyDiscount(coupon,orderList);
+                BigDecimal discount = couponService.Discount(coupon,orderList);
+                BigDecimal grossTotal = orderService.grossTotal(orderList);
+                customerOrder.setGrossTotal(grossTotal);
+                customerOrder.setDiscountTotal(discount);
+                customerOrder.setFinalTotal(totalToPay);
+
+                customerOrderService.updateCustomerOrder(customerOrder);
+
+
+                model.addAttribute("totalToPay",totalToPay);
+                model.addAttribute("discount",discount);
+                model.addAttribute("grossTotal",grossTotal);
+
+
+            }
+
+
             log.info("lISTA {}", orderList);
             return "cart";
 
@@ -114,11 +145,79 @@ public class ShoppingController {
         } else {
             List<CustomerOrder> customerOrders = customerOrderService.getAllCustomerOrders();
             model.addAttribute("customerOrders",customerOrders);
-            String mensaje = "The cart with " + idCart + " is in process";
+            String mensaje = "The cart with " + idCart + " is paid for";
             model.addAttribute("mensaje", mensaje);
 
             return "login";
-            //requi
+
         }
     }
+
+    // Step 2 - Addresses
+    @GetMapping("/checkout/step2")
+    public String addressesGet(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder) {
+        model.addAttribute("customerOrder", customerOrder);
+        return "step2";
+    }
+
+    @PostMapping("/checkout/step2")
+    public String addressesPost(@ModelAttribute("customerOrder") CustomerOrder customerOrder,
+                                @RequestParam(value = "sameAsBilling", required = false) Boolean sameAsBilling, Model model) {
+
+        if (Boolean.TRUE.equals(sameAsBilling)) {
+            customerOrder.setShippingName(customerOrder.getBillingName());
+            customerOrder.setShippingStreet(customerOrder.getBillingStreet());
+            customerOrder.setShippingCity(customerOrder.getBillingCity());
+            customerOrder.setShippingPostalCode(customerOrder.getBillingPostalCode());
+            customerOrder.setShippingCountry(customerOrder.getBillingCountry());
+        }
+        model.addAttribute("customerOrder", customerOrder);
+        return "redirect:/cart/checkout/payment";
+    }
+
+    // Step 3 - Payment
+    @GetMapping("/checkout/payment")
+    public String paymentGet(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder,
+                             @RequestParam(value = "coupon", required = false) String coupon) {
+        log.info("****Customer {} ******* ",customerOrder);
+        List<OrderItem> orderList = orderService.orderlist(customerOrder.getId());
+
+
+        model.addAttribute("orderList", orderList);
+        model.addAttribute("customerOrder", customerOrder);
+
+        return "payment";
+    }
+
+    @PostMapping("/checkout/payment")
+    public String paymentPost(@ModelAttribute("customerOrder") CustomerOrder customerOrder,
+                              @RequestParam("paymentMethod") String paymentMethod, Model model) {
+
+        customerOrder.setPaymentMethod(paymentMethod);
+        // Simulación: siempre éxito
+        customerOrder.setPaymentStatus("PAID");
+
+        // Generar código de pedido falso
+        customerOrder.setOrderNumber("ORD-" + System.currentTimeMillis());
+        List<OrderItem> orderList = orderService.orderlist(customerOrder.getId());
+        BigDecimal grossTotal = orderService.grossTotal(orderList);
+        BigDecimal discountTotal = customerOrder.getDiscountTotal() != null ? customerOrder.getDiscountTotal() : BigDecimal.ZERO;
+        BigDecimal finalTotal = customerOrder.getFinalTotal() != null ? customerOrder.getFinalTotal() : grossTotal;
+
+        customerOrder.setGrossTotal(grossTotal);
+        customerOrder.setDiscountTotal(discountTotal);
+        customerOrder.setFinalTotal(finalTotal);
+        model.addAttribute("customerOrder", customerOrder);
+
+
+        return "redirect:/cart/checkout/completed";
+    }
+
+    // Step 3 - Completed
+    @GetMapping("/checkout/completed")
+    public String completed(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder) {
+        model.addAttribute("customerOrder", customerOrder);
+        return "completed";
+    }
+
 }

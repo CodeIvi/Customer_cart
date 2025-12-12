@@ -1,26 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Access Shopping Cart</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-red {
+            color: #dc3545; /* rojo Bootstrap */
+            font-weight: bold;
+        }
+        .status-green {
+            color: #28a745; /* verde Bootstrap */
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
-<h1>Acceder al Carrito</h1>
+<body class="bg-light">
 
-<div th:each="cart: ${customerOrders}">
-    <label th:text="${cart.id}"></label>
-    <label th:text="${cart.status}"></label>
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+
+            <h1 class="card-title mb-4">Access Shopping Cart</h1>
+            <h3 class="mb-3">Your carts</h3>
+
+            <!-- Lista de carritos -->
+            <div class="list-group mb-4">
+                <div th:each="cart : ${customerOrders}" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>ID: <span th:text="${cart.id}"></span></span>
+                    <span th:text="${cart.status}"
+                          th:classappend="${cart.status != 'new'} ? 'status-red' : 'status-green'">
+                    </span>
+                </div>
+            </div>
+
+            <!-- Formulario para acceder al carrito -->
+            <form th:action="@{/cart/yourcart}" method="post" class="row g-3">
+                <div class="col-md-6">
+                    <label for="cartId" class="form-label">ID del Carrito:</label>
+                    <input type="number" id="cartId" name="idCart" class="form-control" required>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">View cart</button>
+                </div>
+            </form>
+
+            <!-- Mensaje de error o estado -->
+            <div th:if="${mensaje}" class="alert alert-danger mt-4">
+                <span th:text="${mensaje}"></span>
+            </div>
+
+        </div>
+    </div>
 </div>
-<form th:action="@{/cart/yourcart}" method="post">
-    <label for="cartId">ID del Carrito:</label>
-    <input type="number" id="cartId" name="idCart" required>
-    <button type="submit">Ver Carrito</button>
-</form>
 
-<div th:if="${mensaje}">
-    <span th:text="${mensaje}"></span>
-</div>
-
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

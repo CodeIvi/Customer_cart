@@ -50,6 +50,16 @@ public class ShoppingController {
         return "login";
     }
 
+    @GetMapping("/yourcart")
+    public String cartView(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder) {
+            List<OrderItem> orderList = orderService.orderlist(customerOrder.getId());
+            model.addAttribute("orderlist", orderList);
+            model.addAttribute("listaProductos", productService.getALL());
+            model.addAttribute("cart", customerOrder);
+            return "cart";
+
+    }
+
 
     @PostMapping("/yourcart")
     public String cartGet(Model model, @RequestParam(value = "idCart", required = false) Long idCart,

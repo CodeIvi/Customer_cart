@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Carrito de Compra</title>
@@ -66,15 +66,24 @@
 
 
     <h3>Add new product:</h3>
+    <form th:action="@{/cart/yourcart}" method="post">
 
+        <select name="idAddProduct">
+            <option value="">-- Seleccione --</option>
+            <option th:each="prod : ${listaProductos}"
+                    th:value="${prod.id}"
+                    th:text="${prod.name}">
+            </option>
+        </select>
 
-    <form th:action="@{/cart/add}" th:object="${product}" method="post">
-        Name: <input type="text" th:field="*{productName}" required />
-        Price: <input type="number" step="0.01" th:field="*{unitPrice}" required />
-        Qty: <input type="number" th:field="*{quantity}" min="1" required />
-        <input type="hidden" th:field="idCart">
-        <button type="submit">Add</button>
+        <label>Quantity</label>
+        <input type="number" name="quantity">
+        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="idCart" th:value="${idCart}">
+
+        <button>Add</button>
     </form>
+
 
     <hr/>
 
@@ -103,6 +112,8 @@
     <a class="next-step" th:href="@{/checkout/step2}">
         [ Continue to Step 2 > ]
     </a>
+
+</div>
 
 </div>
 </body>

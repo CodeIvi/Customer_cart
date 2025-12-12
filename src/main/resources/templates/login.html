@@ -6,6 +6,11 @@
 </head>
 <body>
 <h1>Acceder al Carrito</h1>
+
+<div th:each="cart: ${customerOrders}">
+    <label th:text="${cart.id}"></label>
+    <label th:text="${cart.status}"></label>
+</div>
 <form th:action="@{/cart/yourcart}" method="post">
     <label for="cartId">ID del Carrito:</label>
     <input type="number" id="cartId" name="idCart" required>

@@ -121,6 +121,7 @@ public class ShoppingController {
                         .quantity(quantity)
                         .lineTotal(getProduct.getPrice().multiply(quantity))
                         .build();
+
                 orderService.createOrderItem(newOrderitem);
                 orderService.update(newOrderitem, idAddProduct);
                 orderList = orderService.orderlist(idCart);
@@ -163,7 +164,7 @@ public class ShoppingController {
         }
     }
 
-    // Step 2 - Addresses
+
     @GetMapping("/checkout/step2")
     public String addressesGet(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder) {
         model.addAttribute("customerOrder", customerOrder);
@@ -204,10 +205,10 @@ public class ShoppingController {
                               @RequestParam("paymentMethod") String paymentMethod, Model model) {
 
         customerOrder.setPaymentMethod(paymentMethod);
-        // Simulación: siempre éxito
+
         customerOrder.setPaymentStatus("PAID");
 
-        // Generar código de pedido falso
+
         customerOrder.setOrderNumber("ORD-" + System.currentTimeMillis());
         List<OrderItem> orderList = orderService.orderlist(customerOrder.getId());
         BigDecimal grossTotal = orderService.grossTotal(orderList);
@@ -223,7 +224,7 @@ public class ShoppingController {
         return "redirect:/cart/checkout/completed";
     }
 
-    // Step 3 - Completed
+
     @GetMapping("/checkout/completed")
     public String completed(Model model, @ModelAttribute("customerOrder") CustomerOrder customerOrder) {
         model.addAttribute("customerOrder", customerOrder);
